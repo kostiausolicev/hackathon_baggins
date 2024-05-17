@@ -5,15 +5,14 @@ import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.AllFilesDto
+import ru.kosti.googledrivemanager.dto.CreateItemDto
 import ru.kosti.googledrivemanager.dto.ItemDto
 import ru.kosti.googledrivemanager.enumeration.MimeType
-import java.io.IOException
 
 @Service
 class DriveService(
     private val drive: Drive
 ) {
-    @Throws(IOException::class)
     fun getAll(
         limit: Int,
         root: String = "1OGPa_sQSfshN8-NspxHJtagj47-0ZzEn",
@@ -30,6 +29,17 @@ class DriveService(
             .setPageToken(pageToken)
             .execute()
         return result.toDto()
+    }
+
+    fun create(newFile: CreateItemDto) {
+        val file = File().apply {
+            name = newFile.name
+            parents = listOf(newFile.parent)
+            mimeType = newFile.type.googleName
+            kind = "drive#file"
+        }
+        drive.files().create(file)
+            .execute()
     }
 
     private fun FileList.toDto(): AllFilesDto {
