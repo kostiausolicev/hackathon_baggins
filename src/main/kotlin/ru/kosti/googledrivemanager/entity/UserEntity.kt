@@ -13,5 +13,7 @@ class UserEntity (
     val firstName: String,
     @Column(name = "last_name")
     val lastName: String,
-    val email: String
+    val email: String,
+    @ManyToOne(fetch = FetchType.EAGER)
+    val role: RoleEntity? = null
 )

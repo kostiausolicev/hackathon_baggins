@@ -7,7 +7,6 @@ import com.google.api.services.drive.model.Permission
 import com.google.api.services.drive.model.PermissionList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
@@ -19,7 +18,8 @@ import ru.kosti.googledrivemanager.enumeration.MimeType
 
 @Service
 class DriveService(
-    private val drive: Drive
+    private val drive: Drive,
+    private val userService: UserService
 ) {
     private val semaphore = Semaphore(500)
 
@@ -42,29 +42,45 @@ class DriveService(
     }
 
     suspend fun create(newFile: CreateItemDto) {
-        val file = File().apply {
-            name = newFile.name
-            parents = listOf(newFile.parent)
-            mimeType = newFile.type.googleName
-            kind = "drive#file"
-        }
-        val fileId = drive.files().create(file)
-            .execute()
-        coroutineScope {
-            // TODO Получить пользователей и дать им права на редактирование
-            val email = "kostiausolicev@gmail.com"
-            semaphore.withPermit {
-                drive.Permissions().create(fileId.id, Permission().apply {
-                    type = "user"
-                    emailAddress = email
-                    role = "writer"
+        CoroutineScope(Dispatchers.Default).launch {
+            val file = File().apply {
+                name = newFile.name
+                parents = listOf(newFile.parent)
+                mimeType = newFile.type.googleName
+                kind = "drive#file"
+            }
+            val fileId = drive.files().create(file).execute()
+            val parents = getFileParents(fileId.id)
+            val usersEmails = parents.flatMap { parent ->
+                userService.findAllByRootAvailablePath(parent).map { it.email }
+            }.toSet()
+            usersEmails.forEach { email ->
+                semaphore.withPermit {
+                    val permission = Permission().apply {
+                        type = "user"
+                        emailAddress = email
+                        role = "writer"
+                    }
+                    drive.permissions().create(fileId.id, permission).execute()
                 }
-                ).execute()
             }
         }
     }
 
-    suspend fun removeAccess(userEmail: String) =
+    private suspend fun getFileParents(fileId: String): List<String> {
+        val parents = mutableListOf<String>()
+        var currentFileId = fileId
+        while (true) {
+            val file = drive.files().get(currentFileId).setFields("parents").execute()
+            val parentId = file.parents?.firstOrNull() ?: break
+            parents.add(parentId)
+            currentFileId = parentId
+        }
+        return parents
+    }
+
+
+    suspend fun removeAccess(userEmail: String) {
         CoroutineScope(Dispatchers.Default).launch {
             val query = "'$userEmail' in writers or '$userEmail' in owners"
             val result = drive.files().list()
@@ -89,25 +105,28 @@ class DriveService(
                 }
             }
         }
+    }
 
-    suspend fun addAccess(userEmail: String, rootFolderId: String) = CoroutineScope(Dispatchers.Default).launch {
-        val foldersToProcess = ArrayDeque<String>()
-        foldersToProcess.add(rootFolderId)
+    suspend fun addAccess(userEmail: String, rootFolderId: String) {
+        CoroutineScope(Dispatchers.Default).launch {
+            val foldersToProcess = ArrayDeque<String>()
+            foldersToProcess.add(rootFolderId)
 
-        while (foldersToProcess.isNotEmpty()) {
-            val currentFolderId = foldersToProcess.removeFirst()
-            val result: List<File> = drive.files().list()
-                .setQ("'$currentFolderId' in parents and trashed=false")
-                .setFields("files(id, name, mimeType)")
-                .execute()
-                .files
-            launch {
-                result.forEach { file: File ->
-                    launch {
-                        semaphore.withPermit {
-                            addEditPermission(userEmail, file.id)
-                            if (file.mimeType == MimeType.FOLDER.googleName) {
-                                foldersToProcess.addLast(file.id)
+            while (foldersToProcess.isNotEmpty()) {
+                val currentFolderId = foldersToProcess.removeFirst()
+                val result: List<File> = drive.files().list()
+                    .setQ("'$currentFolderId' in parents and trashed=false")
+                    .setFields("files(id, name, mimeType)")
+                    .execute()
+                    .files
+                launch {
+                    result.forEach { file: File ->
+                        launch {
+                            semaphore.withPermit {
+                                addEditPermission(userEmail, file.id)
+                                if (file.mimeType == MimeType.FOLDER.googleName) {
+                                    foldersToProcess.addLast(file.id)
+                                }
                             }
                         }
                     }

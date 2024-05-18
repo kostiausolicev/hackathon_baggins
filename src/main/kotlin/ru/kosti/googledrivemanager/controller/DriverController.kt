@@ -2,6 +2,7 @@ package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,6 +16,13 @@ import ru.kosti.googledrivemanager.service.DriveService
 class DriverController(
     private val driveService: DriveService
 ) {
+    @GetMapping("/{root}")
+    fun getAllByRoot(
+        @RequestParam(required = false) limit: Int = 10,
+        @RequestParam(required = false) pageToken: String? = null,
+        @PathVariable root: String
+    ) =
+        driveService.getAll(limit = limit, pageToken = pageToken, root = root)
     @GetMapping
     fun getAll(
         @RequestParam(required = false) limit: Int = 10,
