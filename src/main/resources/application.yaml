@@ -3,6 +3,7 @@ application:
 
 google:
   credentials_path: ${PRIVATE_KEY:/credentials.json}
+  credentials: ${PRIVATE_KEY_FILE}
 
 spring:
   datasource:

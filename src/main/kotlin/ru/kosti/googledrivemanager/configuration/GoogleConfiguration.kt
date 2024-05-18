@@ -18,14 +18,16 @@ import java.io.IOException
 @Configuration
 class GoogleConfiguration(
     @Value("\${google.credentials_path}")
-    private val credentialsFilePath: String
+    private val credentialsFilePath: String,
+    @Value("\${google.credentials}")
+    private val credentialsFile: String
 ) {
     private val jsonFactory = GsonFactory.getDefaultInstance()
     private val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
 
     @Throws(IOException::class)
     fun getCredentials(): Credentials {
-        val key = ClassPathResource(credentialsFilePath).inputStream
+        val key = credentialsFile.byteInputStream()
         val scopes = DriveScopes.all()
         return GoogleCredentials.fromStream(key).createScoped(scopes)
     }
