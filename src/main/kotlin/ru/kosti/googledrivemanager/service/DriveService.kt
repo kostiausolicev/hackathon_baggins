@@ -53,7 +53,7 @@ class DriveService(
             val parents = getFileParents(fileId.id)
             val usersEmails = parents.flatMap { parent ->
                 userService.findAllByRootAvailablePath(parent).map { it.email }
-            }.toSet()
+            }
             usersEmails.forEach { email ->
                 semaphore.withPermit {
                     val permission = Permission().apply {

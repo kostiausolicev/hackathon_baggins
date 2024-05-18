@@ -2,9 +2,9 @@ databaseChangeLog:
   - include:
       id: 1
       file: db/changelog/create_extension.sql
-#  - include:
-#      id: 2
-#      file: db/changelog/create_table_users.sql
-#  - include:
-#      id: 3
-#      file: db/changelog/create_table_roles.sql
+  - include:
+      id: 2
+      file: db/changelog/create_table_roles.sql
+  - include:
+      id: 3
+      file: db/changelog/create_table_users.sql

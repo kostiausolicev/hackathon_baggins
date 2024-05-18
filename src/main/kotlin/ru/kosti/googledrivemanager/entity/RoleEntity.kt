@@ -1,8 +1,6 @@
 package ru.kosti.googledrivemanager.entity
 
 import jakarta.persistence.*
-import org.hibernate.annotations.JdbcTypeCode
-import org.hibernate.type.SqlTypes
 import java.util.*
 
 @Entity
@@ -12,7 +10,8 @@ class RoleEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     val uuid: UUID,
     val title: String,
-    val order: Int,
-    @JdbcTypeCode(SqlTypes.JSON)
+    @ElementCollection
+    @CollectionTable(name = "role_paths", joinColumns = [JoinColumn(name = "role_uuid")])
+    @Column(name = "path")
     val paths: Set<String>
 )
