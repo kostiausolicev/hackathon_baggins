@@ -1,6 +1,7 @@
 package ru.kosti.googledrivemanager.entity
 
 import jakarta.persistence.*
+import ru.kosti.googledrivemanager.enumeration.Roles
 import java.util.UUID
 
 @Entity
@@ -15,6 +16,9 @@ class UserEntity (
     val lastName: String,
     val email: String,
     val isConformed: Boolean = false,
+    @Enumerated(EnumType.STRING)
+    val role: Roles,
     @ManyToOne(fetch = FetchType.EAGER)
-    val role: RoleEntity? = null
+    @JoinColumn(name = "capabilities")
+    val capabilities: CapabilitiesEntity? = null
 )

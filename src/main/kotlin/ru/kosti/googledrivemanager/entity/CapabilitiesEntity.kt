@@ -4,14 +4,14 @@ import jakarta.persistence.*
 import java.util.*
 
 @Entity
-@Table(name = "roles")
-class RoleEntity(
+@Table(name = "capabilities")
+class CapabilitiesEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val uuid: UUID,
     val title: String,
     @ElementCollection
-    @CollectionTable(name = "role_paths", joinColumns = [JoinColumn(name = "role_uuid")])
-    @Column(name = "path")
+    @CollectionTable(name = "capabilities_paths", joinColumns = [JoinColumn(name = "capabilities_uuid")])
+    @Column(name = "capabilities")
     val paths: Set<String>
 )

@@ -7,12 +7,13 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.CreateUserDto
 import ru.kosti.googledrivemanager.entity.UserEntity
+import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.repository.UserRepository
 import java.util.*
 
 @Service
 class UserService(
-    private val roleService: RoleService,
+    private val capabilitiesService: CapabilitiesService,
     private val userRepository: UserRepository,
     private val accessService: AccessService
 ) {
@@ -21,7 +22,7 @@ class UserService(
             ?: throw Exception()
 
     fun findAllByRootAvailablePath(path: String): Set<UserEntity> {
-        val roles = roleService.findByPathsContaining(path)
+        val roles = capabilitiesService.findByPathsContaining(path)
         val users = mutableListOf<UserEntity>()
         roles.forEach { role ->
             users.addAll(userRepository.findAllByRole(role))
@@ -29,8 +30,8 @@ class UserService(
         return users.toSet()
     }
 
-    fun updateRole(user: UUID, newRole: UUID) {
-        val role = roleService.findByIdOrNull(newRole)
+    fun update(user: UUID, newRole: UUID) {
+        val capabilities = capabilitiesService.findByIdOrNull(newRole)
             ?: throw Exception()
         val old = userRepository.findByIdOrNull(user)
             ?: throw Exception()
@@ -39,7 +40,8 @@ class UserService(
             firstName = old.firstName,
             lastName = old.lastName,
             email = old.email,
-            role = role
+            role = old.role,
+            capabilities = capabilities
         )
         userRepository.save(new)
     }
@@ -52,12 +54,13 @@ class UserService(
         UserEntity(
             firstName = dto.firstName,
             lastName = dto.lastName,
+            role = Roles.USER,
             email = dto.email
         ).let { userRepository.save(it) }
     }
 
     suspend fun conform(userUuid: UUID, roleUuid: UUID) {
-        val role = roleService.findByIdOrNull(roleUuid)
+        val capabilities = capabilitiesService.findByIdOrNull(roleUuid)
             ?: throw Exception()
         val ent = userRepository.findByIdOrNull(userUuid)
             ?: throw Exception()
@@ -67,10 +70,11 @@ class UserService(
             lastName = ent.lastName,
             email = ent.email,
             isConformed = true,
-            role = role
+            role = Roles.USER,
+            capabilities = capabilities
         ).let { userRepository.save(it) }
         CoroutineScope(Dispatchers.Default).launch {
-            user.role?.paths?.forEach { path ->
+            user.capabilities?.paths?.forEach { path ->
                 accessService.addAccess(user.email, path)
             }
         }

@@ -7,7 +7,7 @@ import ru.kosti.googledrivemanager.dto.AllFilesDto
 import ru.kosti.googledrivemanager.dto.ItemDto
 import ru.kosti.googledrivemanager.dto.PathDto
 import ru.kosti.googledrivemanager.dto.RoleDto
-import ru.kosti.googledrivemanager.entity.RoleEntity
+import ru.kosti.googledrivemanager.entity.CapabilitiesEntity
 import ru.kosti.googledrivemanager.enumeration.MimeType
 
 
@@ -26,7 +26,7 @@ fun File.toDto(): ItemDto =
         type = MimeType.findByGoogleName(this.mimeType)
     )
 
-fun RoleEntity.toDto(drive: Drive) =
+fun CapabilitiesEntity.toDto(drive: Drive) =
     RoleDto(
         uuid = uuid,
         title = title,

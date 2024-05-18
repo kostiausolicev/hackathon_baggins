@@ -11,3 +11,6 @@ databaseChangeLog:
   - include:
       id: 4
       file: db/changelog/add_isConformed_column_users.sql
+  - include:
+      id: 5
+      file: db/changelog/update_users_table.sql
