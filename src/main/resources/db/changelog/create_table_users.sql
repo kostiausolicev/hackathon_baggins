@@ -6,6 +6,7 @@ CREATE TABLE users
     email             VARCHAR(255),
     capabilities_uuid UUID,
     role              VARCHAR(32),
+    password          TEXT NOT NULL,
     is_conformed      BOOLEAN       DEFAULT FALSE,
     CONSTRAINT pk_users PRIMARY KEY (uuid)
 );

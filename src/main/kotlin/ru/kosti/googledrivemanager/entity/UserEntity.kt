@@ -18,7 +18,9 @@ class UserEntity (
     val isConformed: Boolean = false,
     @Enumerated(EnumType.STRING)
     val role: Roles,
+    val password: String,
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "capabilities")
+    @JoinColumn(name = "capabilities_uuid")
     val capabilities: CapabilitiesEntity? = null
-)
+) {
+}

@@ -25,7 +25,7 @@ class JwtService(
         )
     }
 
-    fun encode(email: String, uuid: UUID): String {
+    fun generate(email: String, uuid: UUID): String {
         return JWT.create()
             .withClaim("uuid", uuid.toString())
             .withClaim("email", email)
