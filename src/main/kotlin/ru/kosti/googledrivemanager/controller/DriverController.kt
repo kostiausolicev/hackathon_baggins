@@ -1,8 +1,7 @@
 package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.*
-import ru.kosti.googledrivemanager.dto.CreateItemDto
-import ru.kosti.googledrivemanager.service.AccessService
+import ru.kosti.googledrivemanager.dto.item.CreateItemDto
 import ru.kosti.googledrivemanager.service.DriveService
 
 @RestController

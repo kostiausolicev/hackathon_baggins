@@ -1,4 +1,4 @@
-package ru.kosti.googledrivemanager.dto
+package ru.kosti.googledrivemanager.dto.capabilities
 
 data class CreateCapabilitiesDto(
     val title: String,

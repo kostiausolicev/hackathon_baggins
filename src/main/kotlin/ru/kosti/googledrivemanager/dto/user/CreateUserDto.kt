@@ -1,4 +1,4 @@
-package ru.kosti.googledrivemanager.dto
+package ru.kosti.googledrivemanager.dto.user
 
 data class CreateUserDto(
     val email: String,

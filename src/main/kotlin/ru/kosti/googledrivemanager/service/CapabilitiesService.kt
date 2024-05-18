@@ -3,8 +3,8 @@ package ru.kosti.googledrivemanager.service
 import com.google.api.services.drive.Drive
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import ru.kosti.googledrivemanager.dto.CreateCapabilitiesDto
-import ru.kosti.googledrivemanager.dto.UpdateCapabilitiesDto
+import ru.kosti.googledrivemanager.dto.capabilities.CreateCapabilitiesDto
+import ru.kosti.googledrivemanager.dto.capabilities.UpdateCapabilitiesDto
 import ru.kosti.googledrivemanager.entity.CapabilitiesEntity
 import ru.kosti.googledrivemanager.extention.toDto
 import ru.kosti.googledrivemanager.repository.RoleRepository

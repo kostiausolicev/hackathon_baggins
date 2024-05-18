@@ -11,8 +11,8 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
-import ru.kosti.googledrivemanager.dto.AllFilesDto
-import ru.kosti.googledrivemanager.dto.CreateItemDto
+import ru.kosti.googledrivemanager.dto.item.AllFilesDto
+import ru.kosti.googledrivemanager.dto.item.CreateItemDto
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.extention.toDto
 

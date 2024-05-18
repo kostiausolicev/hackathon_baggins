@@ -1,4 +1,4 @@
-package ru.kosti.googledrivemanager.dto
+package ru.kosti.googledrivemanager.dto.item
 
 data class AllFilesDto(
     val nextPage: String? = null,

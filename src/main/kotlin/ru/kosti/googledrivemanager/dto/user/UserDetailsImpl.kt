@@ -1,4 +1,4 @@
-package ru.kosti.googledrivemanager.dto
+package ru.kosti.googledrivemanager.dto.user
 
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails

@@ -1,9 +1,9 @@
-package ru.kosti.googledrivemanager.dto
+package ru.kosti.googledrivemanager.dto.item
 
 import ru.kosti.googledrivemanager.enumeration.MimeType
 
-data class CreateItemDto(
+data class ItemDto(
+    val id: String,
     val name: String,
-    val parent: String,
     val type: MimeType
 )

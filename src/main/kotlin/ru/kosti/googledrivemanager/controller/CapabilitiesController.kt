@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.kosti.googledrivemanager.dto.CreateCapabilitiesDto
-import ru.kosti.googledrivemanager.dto.UpdateCapabilitiesDto
+import ru.kosti.googledrivemanager.dto.capabilities.CreateCapabilitiesDto
+import ru.kosti.googledrivemanager.dto.capabilities.UpdateCapabilitiesDto
 import ru.kosti.googledrivemanager.service.CapabilitiesService
 
 @RestController

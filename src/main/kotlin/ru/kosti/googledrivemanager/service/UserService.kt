@@ -9,8 +9,9 @@ import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import ru.kosti.googledrivemanager.dto.CreateUserDto
-import ru.kosti.googledrivemanager.dto.UserDetailsImpl
+import ru.kosti.googledrivemanager.dto.user.CreateUserDto
+import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
+import ru.kosti.googledrivemanager.dto.user.UserDetailsImpl
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.repository.UserRepository
@@ -37,21 +38,28 @@ class UserService(
         return users.toSet()
     }
 
-    suspend fun update(user: UUID, newRole: UUID) {
-        val capabilities = capabilitiesService.findByIdOrNull(newRole)
+    suspend fun update(dto: UpdateUserDto) {
+        val old = userRepository.findByIdOrNull(dto.uuid)
             ?: throw Exception()
-        val old = userRepository.findByIdOrNull(user)
-            ?: throw Exception()
+        val capabilities = if (dto.capabilities != null)
+            capabilitiesService.findByIdOrNull(dto.capabilities)
+                ?: throw Exception()
+        else old.capabilities
         val new = UserEntity(
             uuid = old.uuid,
-            firstName = old.firstName,
-            lastName = old.lastName,
+            firstName = dto.firstName ?: old.firstName,
+            lastName = dto.lastName ?: old.lastName,
             email = old.email,
-            role = old.role,
+            role = dto.role ?: old.role,
             password = old.password,
             capabilities = capabilities
-        )
-        userRepository.save(new)
+        ).let { userRepository.save(it) }
+        CoroutineScope(Dispatchers.Default).launch {
+            accessService.removeAccess(new.email)
+            new.capabilities?.paths?.forEach { path ->
+                accessService.addAccess(new.email, path)
+            }
+        }
     }
 
     suspend fun createUser(dto: CreateUserDto): String {

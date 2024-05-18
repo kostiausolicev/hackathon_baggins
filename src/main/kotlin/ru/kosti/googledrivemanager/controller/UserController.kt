@@ -1,7 +1,8 @@
 package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.*
-import ru.kosti.googledrivemanager.dto.CreateUserDto
+import ru.kosti.googledrivemanager.dto.user.CreateUserDto
+import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
 import ru.kosti.googledrivemanager.service.UserService
 import java.util.*
 
@@ -17,4 +18,8 @@ class UserController(
     @PostMapping("/conform/{uuid}")
     suspend fun conform(@PathVariable uuid: UUID, @RequestParam role: UUID) =
         userService.conform(userUuid = uuid, roleUuid = role)
+
+    @PatchMapping
+    suspend fun update(@RequestBody dto: UpdateUserDto) =
+        userService.update(dto)
 }

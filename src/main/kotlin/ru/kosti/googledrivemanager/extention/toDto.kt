@@ -3,10 +3,10 @@ package ru.kosti.googledrivemanager.extention
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
 import com.google.api.services.drive.model.FileList
-import ru.kosti.googledrivemanager.dto.AllFilesDto
-import ru.kosti.googledrivemanager.dto.ItemDto
-import ru.kosti.googledrivemanager.dto.PathDto
-import ru.kosti.googledrivemanager.dto.CapabilitiesDto
+import ru.kosti.googledrivemanager.dto.item.AllFilesDto
+import ru.kosti.googledrivemanager.dto.item.ItemDto
+import ru.kosti.googledrivemanager.dto.capabilities.PathDto
+import ru.kosti.googledrivemanager.dto.capabilities.CapabilitiesDto
 import ru.kosti.googledrivemanager.entity.CapabilitiesEntity
 import ru.kosti.googledrivemanager.enumeration.MimeType
 

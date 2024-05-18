@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import ru.kosti.googledrivemanager.dto.UserDtoOnRequest
+import ru.kosti.googledrivemanager.dto.user.UserDtoOnRequest
 import java.util.*
 
 @Service
