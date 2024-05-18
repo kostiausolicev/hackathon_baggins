@@ -12,10 +12,13 @@ class JwtService(
     @Value("\${jwt.secret}")
     val secret: String,
 ) {
-    fun decode(token: String): UserDtoOnRequest {
+    fun decode(rawToken: String): UserDtoOnRequest {
+        val token = if (rawToken.startsWith("Bearer"))
+            rawToken.split(' ')[1]
+        else rawToken
         val data = JWT.require(Algorithm.HMAC256(secret))
             .build()
-            .verify(token.split(' ')[1])
+            .verify(token)
         val email = data.getClaim("email").asString()
         val uuid = data.getClaim("uuid").asString()
             .let { UUID.fromString(it) }

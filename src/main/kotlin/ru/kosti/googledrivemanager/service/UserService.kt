@@ -24,7 +24,7 @@ class UserService(
     private val accessService: AccessService,
     private val jwtService: JwtService,
     private val passwordEncoder: BCryptPasswordEncoder
-) : UserDetailsService {
+) {
     suspend fun findByIdOrNull(userUuid: UUID) =
         userRepository.findByIdOrNull(userUuid)
             ?: throw Exception()
@@ -105,15 +105,5 @@ class UserService(
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)
         }
-    }
-
-    override fun loadUserByUsername(username: String?): UserDetails {
-        val uuid = username?.let { UUID.fromString(it) } ?: throw Exception()
-        val user = runBlocking { findByIdOrNull(uuid) }
-        return UserDetailsImpl(
-            role = user.role,
-            username = username,
-            password = user.password
-        )
     }
 }

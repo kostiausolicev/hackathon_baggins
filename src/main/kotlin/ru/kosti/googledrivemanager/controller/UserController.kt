@@ -11,8 +11,8 @@ import java.util.*
 class UserController(
     private val userService: UserService
 ) {
-    @PostMapping
-    suspend fun create(@RequestBody dto: CreateUserDto) =
+    @PostMapping("/register")
+    suspend fun register(@RequestBody dto: CreateUserDto) =
         userService.createUser(dto)
 
     @PostMapping("/conform/{uuid}")

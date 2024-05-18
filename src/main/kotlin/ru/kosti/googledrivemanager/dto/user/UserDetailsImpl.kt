@@ -5,12 +5,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import ru.kosti.googledrivemanager.enumeration.Roles
 
 class UserDetailsImpl(
-    private val role: Roles,
+    private val role: String,
     private val username: String,
     private val password: String
 ): UserDetails {
     override fun getAuthorities(): List<GrantedAuthority> =
-        listOf(GrantedAuthority { role.name })
+        listOf(GrantedAuthority { role })
 
     override fun getPassword(): String =
         password
