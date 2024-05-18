@@ -14,6 +14,7 @@ class UserEntity (
     @Column(name = "last_name")
     val lastName: String,
     val email: String,
+    val isConformed: Boolean = false,
     @ManyToOne(fetch = FetchType.EAGER)
     val role: RoleEntity? = null
 )

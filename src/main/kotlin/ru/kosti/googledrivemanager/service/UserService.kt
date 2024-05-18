@@ -45,11 +45,28 @@ class UserService(
     }
 
     suspend fun createUser(dto: CreateUserDto) {
-        val role = roleService.findByIdOrNull(dto.role)
-        val user = UserEntity(
+        if (!dto.email.contains("@"))
+            throw Exception()
+        if (dto.email.split('@')[1] != "gmail.com")
+            throw Exception()
+        UserEntity(
             firstName = dto.firstName,
             lastName = dto.lastName,
-            email = dto.email,
+            email = dto.email
+        ).let { userRepository.save(it) }
+    }
+
+    suspend fun conform(userUuid: UUID, roleUuid: UUID) {
+        val role = roleService.findByIdOrNull(roleUuid)
+            ?: throw Exception()
+        val ent = userRepository.findByIdOrNull(userUuid)
+            ?: throw Exception()
+        val user = UserEntity(
+            uuid = ent.uuid,
+            firstName = ent.firstName,
+            lastName = ent.lastName,
+            email = ent.email,
+            isConformed = true,
             role = role
         ).let { userRepository.save(it) }
         CoroutineScope(Dispatchers.Default).launch {
