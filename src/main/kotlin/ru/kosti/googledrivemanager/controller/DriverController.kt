@@ -1,6 +1,7 @@
 package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,6 +23,16 @@ class DriverController(
         driveService.getAll(limit = limit, pageToken = pageToken)
 
     @PostMapping
-    fun create(@RequestBody createItemDto: CreateItemDto) =
+    suspend fun create(@RequestBody createItemDto: CreateItemDto) =
         driveService.create(createItemDto)
+
+    @PatchMapping("/access/add")
+    suspend fun addAccess() {
+        driveService.addAccess("kostiausolicev@gmail.com", "1OGPa_sQSfshN8-NspxHJtagj47-0ZzEn")
+    }
+
+    @PatchMapping("/access/remove")
+    suspend fun removeAccess() {
+        driveService.removeAccess("kostiausolicev@gmail.com")
+    }
 }

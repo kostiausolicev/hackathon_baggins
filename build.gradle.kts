@@ -37,6 +37,9 @@ dependencies {
     implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0")
     implementation("com.google.auth:google-auth-library-oauth2-http:1.23.0")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.8.0")
+
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
