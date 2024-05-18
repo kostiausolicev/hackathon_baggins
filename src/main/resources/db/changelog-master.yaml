@@ -8,9 +8,3 @@ databaseChangeLog:
   - include:
       id: 3
       file: db/changelog/create_table_users.sql
-  - include:
-      id: 4
-      file: db/changelog/add_isConformed_column_users.sql
-  - include:
-      id: 5
-      file: db/changelog/update_users_table.sql

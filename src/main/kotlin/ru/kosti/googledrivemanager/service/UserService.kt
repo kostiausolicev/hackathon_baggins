@@ -21,7 +21,7 @@ class UserService(
         userRepository.findByIdOrNull(userUuid)
             ?: throw Exception()
 
-    fun findAllByRootAvailablePath(path: String): Set<UserEntity> {
+    suspend fun findAllByRootAvailablePath(path: String): Set<UserEntity> {
         val roles = capabilitiesService.findByPathsContaining(path)
         val users = mutableListOf<UserEntity>()
         roles.forEach { role ->
@@ -30,7 +30,7 @@ class UserService(
         return users.toSet()
     }
 
-    fun update(user: UUID, newRole: UUID) {
+    suspend fun update(user: UUID, newRole: UUID) {
         val capabilities = capabilitiesService.findByIdOrNull(newRole)
             ?: throw Exception()
         val old = userRepository.findByIdOrNull(user)

@@ -6,7 +6,7 @@ import com.google.api.services.drive.model.FileList
 import ru.kosti.googledrivemanager.dto.AllFilesDto
 import ru.kosti.googledrivemanager.dto.ItemDto
 import ru.kosti.googledrivemanager.dto.PathDto
-import ru.kosti.googledrivemanager.dto.RoleDto
+import ru.kosti.googledrivemanager.dto.CapabilitiesDto
 import ru.kosti.googledrivemanager.entity.CapabilitiesEntity
 import ru.kosti.googledrivemanager.enumeration.MimeType
 
@@ -27,14 +27,12 @@ fun File.toDto(): ItemDto =
     )
 
 fun CapabilitiesEntity.toDto(drive: Drive) =
-    RoleDto(
+    CapabilitiesDto(
         uuid = uuid,
         title = title,
-        paths = paths.map {
-            val name: String = drive.files().list()
-                .setFields("files(id, name)")
-                .execute()
-                .files.first().name
-            PathDto(name = name, id = it)
+        paths = paths.map { pathId ->
+            val file = drive.files().get(pathId).setFields("id, name").execute()
+            val name = file.name
+            PathDto(name = name, id = pathId)
         }
     )

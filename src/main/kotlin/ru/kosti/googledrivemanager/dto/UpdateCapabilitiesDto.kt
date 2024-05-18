@@ -1,14 +1,9 @@
 package ru.kosti.googledrivemanager.dto
 
-import java.util.*
+import java.util.UUID
 
-data class RoleDto(
+data class UpdateCapabilitiesDto(
     val uuid: UUID,
     val title: String,
     val paths: List<PathDto>
-)
-
-data class PathDto(
-    val name: String,
-    val id: String
 )

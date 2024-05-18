@@ -11,21 +11,23 @@ class DriverController(
     private val driveService: DriveService
 ) {
     @GetMapping("/{root}")
-    fun getAllByRoot(
+    suspend fun getAllByRoot(
+        @RequestHeader("Authorization") token: String,
         @RequestParam(required = false) limit: Int = 10,
         @RequestParam(required = false) pageToken: String? = null,
         @PathVariable root: String
     ) =
-        driveService.getAll(limit = limit, pageToken = pageToken, folderId = root)
+        driveService.getAll(limit = limit, pageToken = pageToken, folderId = root, token = token)
 
     @GetMapping
-    fun getAll(
+    suspend fun getAll(
+        @RequestHeader("Authorization") token: String,
         @RequestParam(required = false) limit: Int = 10,
         @RequestParam(required = false) pageToken: String? = null
     ) =
-        driveService.getAll(limit = limit, pageToken = pageToken)
+        driveService.getAll(limit = limit, pageToken = pageToken, token = token)
 
     @PostMapping
-    suspend fun create(@RequestBody createItemDto: CreateItemDto) =
-        driveService.create(createItemDto)
+    suspend fun create(@RequestHeader("Authorization") token: String, @RequestBody createItemDto: CreateItemDto) =
+        driveService.create(createItemDto, token)
 }

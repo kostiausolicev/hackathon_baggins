@@ -1,7 +1,7 @@
 CREATE TABLE capabilities_paths
 (
     capabilities_uuid UUID NOT NULL,
-    path      VARCHAR(255)
+    path              VARCHAR(255)
 );
 
 CREATE TABLE capabilities
@@ -12,4 +12,4 @@ CREATE TABLE capabilities
 );
 
 ALTER TABLE capabilities_paths
-    ADD CONSTRAINT fk_capabilities_paths_on_capabilities_entity FOREIGN KEY (capabilities_uuid) REFERENCES capabilities (uuid);
+    ADD CONSTRAINT fk_capabilities_paths_on_capabilities FOREIGN KEY (capabilities_uuid) REFERENCES capabilities (uuid);

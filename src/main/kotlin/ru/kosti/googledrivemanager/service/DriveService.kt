@@ -9,10 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
+import kotlinx.coroutines.withContext
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.AllFilesDto
 import ru.kosti.googledrivemanager.dto.CreateItemDto
-import ru.kosti.googledrivemanager.dto.UserDtoOnRequest
+import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.extention.toDto
 
 @Service
@@ -20,15 +21,21 @@ class DriveService(
     private val drive: Drive,
     private val semaphore: Semaphore,
     private val userService: UserService,
-    private val currentUser: UserDtoOnRequest
+    private val jwtService: JwtService
 ) {
-    fun getAll(
+    suspend fun getAll(
         limit: Int,
         folderId: String = "1OGPa_sQSfshN8-NspxHJtagj47-0ZzEn",
-        pageToken: String? = null
+        pageToken: String? = null,
+        token: String
     ): AllFilesDto {
-        val query = "'$folderId' in parents"
+        val currentUserUuid = jwtService.decode(token).uuid
+        val user = userService.findByIdOrNull(currentUserUuid)
 
+        if (!checkCapabilities(folderId, user)) {
+            throw Exception("User does not have the required capabilities")
+        }
+        val query = "'$folderId' in parents"
         val result: FileList = drive.files().list()
             .setQ(query)
             .setSpaces("drive")
@@ -39,21 +46,31 @@ class DriveService(
         return result.toDto()
     }
 
-    suspend fun create(newFile: CreateItemDto) {
+    suspend fun create(newFile: CreateItemDto, token: String) {
+        val currentUserUuid = jwtService.decode(token).uuid
+        val user = userService.findByIdOrNull(currentUserUuid)
+
+        if (!checkCapabilities(newFile.parent, user)) {
+            throw Exception("User does not have the required capabilities")
+        }
         CoroutineScope(Dispatchers.Default).launch {
-            if (!checkCapabilities(newFile.parent))
-                throw Exception()
+
             val file = File().apply {
                 name = newFile.name
                 parents = listOf(newFile.parent)
                 mimeType = newFile.type.googleName
                 kind = "drive#file"
             }
-            val fileId = drive.files().create(file).execute()
-            val parents = getFileParents(fileId.id)
+
+            val fileId = withContext(Dispatchers.IO) {
+                drive.files().create(file).execute().id
+            }
+
+            val parents = getFileParents(fileId)
             val usersEmails = parents.flatMap { parent ->
                 userService.findAllByRootAvailablePath(parent).map { it.email }
             }
+
             usersEmails.forEach { email ->
                 semaphore.withPermit {
                     val permission = Permission().apply {
@@ -61,20 +78,20 @@ class DriveService(
                         emailAddress = email
                         role = "writer"
                     }
-                    drive.permissions().create(fileId.id, permission).execute()
+                    withContext(Dispatchers.IO) {
+                        drive.permissions().create(fileId, permission).execute()
+                    }
                 }
             }
         }
     }
 
-    private suspend fun checkCapabilities(path: String): Boolean {
-        val user = userService.findByIdOrNull(currentUser.uuid)
-        if (!user.isConformed)
-            throw Exception()
+    private suspend fun checkCapabilities(path: String, user: UserEntity): Boolean {
         val availablePaths = getFileParents(path)
         availablePaths.forEach {
-            if (it in (user.capabilities?.paths ?: emptySet()))
+            if (it in (user.capabilities?.paths ?: emptySet())) {
                 return true
+            }
         }
         return false
     }

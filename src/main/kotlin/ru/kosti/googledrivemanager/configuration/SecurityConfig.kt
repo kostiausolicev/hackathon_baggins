@@ -27,9 +27,4 @@ class SecurityConfig {
             .formLogin { disable() }
         return http.build()
     }
-
-    @Bean
-    @Scope(scopeName = SCOPE_REQUEST)
-    fun requestUser() =
-        UserDtoOnRequest()
 }
