@@ -28,7 +28,7 @@ class UserController(
         @RequestHeader("Authorization") token: String,
         @PathVariable uuid: UUID
     ) =
-        userService.findById(uuid)
+        userService.findDtoById(uuid)
 
     @PostMapping("/register")
     suspend fun register(@RequestBody dto: CreateUserDto) =

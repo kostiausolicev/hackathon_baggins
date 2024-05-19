@@ -10,7 +10,7 @@ class CapabilitiesEntity(
     @GeneratedValue(strategy = GenerationType.UUID)
     val uuid: UUID = UUID.randomUUID(),
     val title: String,
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
         name = "capabilities_paths",
         joinColumns = [JoinColumn(name = "capabilities_uuid")]

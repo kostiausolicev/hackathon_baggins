@@ -8,5 +8,5 @@ import java.util.*
 
 @Repository
 interface UserRepository : JpaRepository<UserEntity, UUID> {
-    fun findAllByRole(role: CapabilitiesEntity): List<UserEntity>
+    fun findAllByCapabilities(capabilities: CapabilitiesEntity): List<UserEntity>
 }
