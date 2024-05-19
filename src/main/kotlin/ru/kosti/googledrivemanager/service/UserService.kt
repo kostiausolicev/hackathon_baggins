@@ -31,6 +31,11 @@ class UserService(
     private val drive: Drive,
     private val passwordEncoder: BCryptPasswordEncoder
 ) {
+    suspend fun findDtoById(userUuid: UUID) =
+        userRepository.findByIdOrNull(userUuid)
+            ?.toDto(drive)
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
+
     suspend fun findById(userUuid: UUID) =
         userRepository.findByIdOrNull(userUuid)
             ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
@@ -39,7 +44,7 @@ class UserService(
         val roles = capabilitiesService.findByPathsContaining(path)
         val users = mutableListOf<UserEntity>()
         roles.forEach { role ->
-            users.addAll(userRepository.findAllByRole(role))
+            users.addAll(userRepository.findAllByCapabilities(role))
         }
         return users.toSet()
     }
@@ -112,7 +117,8 @@ class UserService(
     }
 
     suspend fun deleteUser(userUuid: UUID) {
-        val user = findById(userUuid)
+        val user = userRepository.findByIdOrNull(userUuid)
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
         userRepository.delete(user)
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)

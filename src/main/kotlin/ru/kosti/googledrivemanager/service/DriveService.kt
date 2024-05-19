@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.item.AllFilesDto
 import ru.kosti.googledrivemanager.dto.item.CreateItemDto
+import ru.kosti.googledrivemanager.dto.user.UserDto
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.exception.ApiException
 import ru.kosti.googledrivemanager.extention.toDto
@@ -90,8 +91,9 @@ class DriveService(
 
     private suspend fun checkCapabilities(path: String, user: UserEntity): Boolean {
         val availablePaths = getFileParents(path)
+        val p = user.capabilities?.paths ?: emptySet()
         availablePaths.forEach {
-            if (it in (user.capabilities?.paths ?: emptySet())) {
+            if (it in p) {
                 return true
             }
         }
