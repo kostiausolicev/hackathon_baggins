@@ -2,8 +2,7 @@ package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.*
 import ru.kosti.googledrivemanager.aop.CheckToken
-import ru.kosti.googledrivemanager.dto.user.CreateUserDto
-import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
+import ru.kosti.googledrivemanager.dto.user.*
 import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.service.UserService
 import java.util.*
@@ -19,7 +18,7 @@ class UserController(
         @RequestHeader("Authorization") token: String,
         @RequestParam(required = false) limit: Int = 10,
         @RequestParam(required = false) page: Int = 0
-    ) =
+    ): List<UserDto> =
         userService.findAll(limit, page)
 
     @GetMapping("/{uuid}")
@@ -27,12 +26,16 @@ class UserController(
     suspend fun getByUuid(
         @RequestHeader("Authorization") token: String,
         @PathVariable uuid: UUID
-    ) =
+    ): UserDto =
         userService.findDtoById(uuid)
 
     @PostMapping("/register")
     suspend fun register(@RequestBody dto: CreateUserDto) =
         userService.createUser(dto)
+
+    @PostMapping("/auth")
+    suspend fun auth(@RequestBody dto: AuthUserDto): SuccessAuthDto =
+        userService.auth(dto)
 
     @PostMapping("/conform/{uuid}")
     @CheckToken(Roles.ADMIN)
@@ -42,6 +45,13 @@ class UserController(
         @RequestParam role: UUID
     ) =
         userService.conform(userUuid = uuid, roleUuid = role)
+    @PostMapping("/unconform/{uuid}")
+    @CheckToken(Roles.ADMIN)
+    suspend fun unconform(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable uuid: UUID
+    ) =
+        userService.deleteUser(userUuid = uuid)
 
     @PatchMapping
     @CheckToken(Roles.ADMIN)

@@ -12,9 +12,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import ru.kosti.googledrivemanager.dto.user.CreateUserDto
-import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
-import ru.kosti.googledrivemanager.dto.user.UserDto
+import ru.kosti.googledrivemanager.dto.user.*
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.exception.ApiException
@@ -49,10 +47,10 @@ class UserService(
         return users.toSet()
     }
 
-    suspend fun findAll(limit: Int, page: Int = 0): Page<UserDto> {
+    suspend fun findAll(limit: Int, page: Int = 0): List<UserDto> {
         val pageable = PageRequest.of(page, limit, Sort.by(Sort.Order.asc("isConformed")))
         val users = userRepository.findAll(pageable)
-        return PageImpl(users.content.map { it.toDto(drive) })
+        return users.content.map { it.toDto(drive) }
     }
 
     suspend fun update(dto: UpdateUserDto) {
@@ -79,7 +77,7 @@ class UserService(
         }
     }
 
-    suspend fun createUser(dto: CreateUserDto): String {
+    suspend fun createUser(dto: CreateUserDto) {
         if (!dto.email.contains("@"))
             throw Exception()
         if (dto.email.split('@')[1] != "gmail.com")
@@ -93,7 +91,7 @@ class UserService(
             password = passwordEncoder.encode(dto.password),
             email = dto.email
         ).let { userRepository.save(it) }
-        return jwtService.generate(email = user.email, uuid = user.uuid)
+//        return jwtService.generate(email = user.email, uuid = user.uuid)
     }
 
     suspend fun conform(userUuid: UUID, roleUuid: UUID) {
@@ -123,5 +121,16 @@ class UserService(
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)
         }
+    }
+
+    fun auth(dto: AuthUserDto): SuccessAuthDto {
+        val user = userRepository.findByEmail(dto.email)
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
+        if (!passwordEncoder.matches(dto.password, user.password))
+            throw ApiException(HttpStatusCode.valueOf(405), "Wrong password")
+        return SuccessAuthDto(
+            token = jwtService.generate(email = user.email, uuid = user.uuid),
+            role = user.role
+        )
     }
 }

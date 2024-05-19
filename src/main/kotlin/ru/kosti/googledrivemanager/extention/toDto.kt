@@ -21,6 +21,21 @@ fun FileList.toDto(): AllFilesDto {
     )
 }
 
+fun Set<String>.toDto(drive: Drive): AllFilesDto {
+    val items = this.map {
+        val file = drive.files().get(it).setFields("id, name, mimeType").execute()
+        ItemDto(
+            id = it,
+            name = file.name,
+            type = MimeType.findByGoogleName(file.mimeType)
+        )
+    }
+    return AllFilesDto(
+        nextPage = null,
+        items = items
+    )
+}
+
 fun File.toDto(): ItemDto =
     ItemDto(
         id = this.id,

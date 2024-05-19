@@ -28,4 +28,4 @@ springdoc:
 
 jwt:
   secret: ${JWT_SECRET:a}
-  ttl: 3600
+  ttl: 99999999
