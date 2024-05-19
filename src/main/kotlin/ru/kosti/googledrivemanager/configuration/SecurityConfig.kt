@@ -20,14 +20,6 @@ class SecurityConfig {
             .csrf { disable() }
             .cors { disable() }
             .authorizeHttpRequests()
-//            .requestMatchers("/drive/**").authenticated()
-//            .requestMatchers("/user/conform/*").hasRole(Roles.ADMIN.name)
-//            .requestMatchers("/user/auth").permitAll()
-//            .requestMatchers("/user/register").permitAll()
-//            .requestMatchers(HttpMethod.PATCH, "/user").hasRole(Roles.ADMIN.name)
-//            .requestMatchers(HttpMethod.PATCH, "/capabilities").hasRole(Roles.ADMIN.name)
-//            .requestMatchers(HttpMethod.POST, "/capabilities").hasRole(Roles.ADMIN.name)
-//            .requestMatchers(HttpMethod.GET, "/capabilities").authenticated()
             .anyRequest().permitAll()
         return http.build()
     }
