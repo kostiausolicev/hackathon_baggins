@@ -9,4 +9,6 @@ import java.util.*
 @Repository
 interface UserRepository : JpaRepository<UserEntity, UUID> {
     fun findAllByCapabilities(capabilities: CapabilitiesEntity): List<UserEntity>
+
+    fun findByEmail(email: String): UserEntity?
 }

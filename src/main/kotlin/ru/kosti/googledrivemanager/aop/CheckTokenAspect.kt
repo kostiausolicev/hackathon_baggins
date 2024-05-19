@@ -40,11 +40,14 @@ class CheckTokenAspect(
             return ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED)
         }
         val currentRole = try {
-            runBlocking { userService.findById(user.uuid).role }
+            runBlocking { userService.findById(user.uuid) }
         } catch (ex: Exception) {
             return ResponseEntity<String>(ex.message, HttpStatus.BAD_REQUEST)
         }
-        if (roleRequired.order < currentRole.order) {
+        if (!currentRole.isConformed) {
+            return ResponseEntity<String>("Access deny", HttpStatus.FORBIDDEN)
+        }
+        if (roleRequired.order < currentRole.role.order) {
             return ResponseEntity<String>("Access deny", HttpStatus.FORBIDDEN)
         }
         return pjp.proceed()
