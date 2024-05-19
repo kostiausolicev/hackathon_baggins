@@ -4,8 +4,6 @@ import com.google.api.services.drive.Drive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -51,7 +49,11 @@ class UserService(
     suspend fun findAll(limit: Int, page: Int = 0): List<UserDto> {
         val pageable = PageRequest.of(page, limit, Sort.by(Sort.Order.asc("isConformed")))
         val users = userRepository.findAll(pageable)
-        return users.content.map { it.toDto(drive) }
+        return users.content.mapNotNull {
+            if (it.emailConform)
+                it.toDto(drive)
+            else null
+        }
     }
 
     suspend fun update(dto: UpdateUserDto) {
