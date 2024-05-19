@@ -13,13 +13,26 @@ import java.util.*
 class UserController(
     private val userService: UserService
 ) {
+    @GetMapping
+    @CheckToken(Roles.ADMIN)
+    suspend fun getAll(
+        @RequestHeader("Authorization") token: String,
+        @RequestParam(required = false) limit: Int = 10,
+        @RequestParam(required = false) page: Int = 0
+    ) =
+        userService.findAll(limit, page)
+
     @PostMapping("/register")
     suspend fun register(@RequestBody dto: CreateUserDto) =
         userService.createUser(dto)
 
     @PostMapping("/conform/{uuid}")
     @CheckToken(Roles.ADMIN)
-    suspend fun conform(@PathVariable uuid: UUID, @RequestParam role: UUID) =
+    suspend fun conform(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable uuid: UUID,
+        @RequestParam role: UUID
+    ) =
         userService.conform(userUuid = uuid, roleUuid = role)
 
     @PatchMapping

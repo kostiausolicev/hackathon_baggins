@@ -7,7 +7,9 @@ import ru.kosti.googledrivemanager.dto.item.AllFilesDto
 import ru.kosti.googledrivemanager.dto.item.ItemDto
 import ru.kosti.googledrivemanager.dto.capabilities.PathDto
 import ru.kosti.googledrivemanager.dto.capabilities.CapabilitiesDto
+import ru.kosti.googledrivemanager.dto.user.UserDto
 import ru.kosti.googledrivemanager.entity.CapabilitiesEntity
+import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.MimeType
 
 
@@ -35,4 +37,15 @@ fun CapabilitiesEntity.toDto(drive: Drive) =
             val name = file.name
             PathDto(name = name, id = pathId)
         }
+    )
+
+fun UserEntity.toDto(drive: Drive) =
+    UserDto(
+        uuid = this.uuid,
+        lastName = this.lastName,
+        firstName = this.firstName,
+        isConform = this.isConformed,
+        email = this.email,
+        roles = this.role,
+        capabilities = this.capabilities?.toDto(drive)
     )

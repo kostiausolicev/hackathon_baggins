@@ -22,5 +22,4 @@ class UserEntity (
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "capabilities_uuid")
     val capabilities: CapabilitiesEntity? = null
-) {
-}
+)

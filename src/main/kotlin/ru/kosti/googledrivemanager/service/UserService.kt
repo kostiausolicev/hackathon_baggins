@@ -1,17 +1,24 @@
 package ru.kosti.googledrivemanager.service
 
+import com.google.api.services.drive.Drive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatusCode
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.user.CreateUserDto
 import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
+import ru.kosti.googledrivemanager.dto.user.UserDto
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.exception.ApiException
+import ru.kosti.googledrivemanager.extention.toDto
 import ru.kosti.googledrivemanager.repository.UserRepository
 import java.util.*
 
@@ -21,6 +28,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val accessService: AccessService,
     private val jwtService: JwtService,
+    private val drive: Drive,
     private val passwordEncoder: BCryptPasswordEncoder
 ) {
     suspend fun findById(userUuid: UUID) =
@@ -34,6 +42,12 @@ class UserService(
             users.addAll(userRepository.findAllByRole(role))
         }
         return users.toSet()
+    }
+
+    suspend fun findAll(limit: Int, page: Int = 0): Page<UserDto> {
+        val pageable = PageRequest.of(page, limit, Sort.by(Sort.Order.asc("isConformed")))
+        val users = userRepository.findAll(pageable)
+        return PageImpl(users.content.map { it.toDto(drive) })
     }
 
     suspend fun update(dto: UpdateUserDto) {

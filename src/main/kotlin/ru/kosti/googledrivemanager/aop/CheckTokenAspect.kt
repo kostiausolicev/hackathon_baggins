@@ -44,7 +44,7 @@ class CheckTokenAspect(
         } catch (ex: Exception) {
             return ResponseEntity<String>(ex.message, HttpStatus.BAD_REQUEST)
         }
-        if (roleRequired.order > currentRole.order) {
+        if (roleRequired.order < currentRole.order) {
             return ResponseEntity<String>("Access deny", HttpStatus.FORBIDDEN)
         }
         return pjp.proceed()
