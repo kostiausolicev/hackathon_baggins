@@ -42,6 +42,13 @@ class UserController(
         @RequestParam role: UUID
     ) =
         userService.conform(userUuid = uuid, roleUuid = role)
+    @PostMapping("/unconform/{uuid}")
+    @CheckToken(Roles.ADMIN)
+    suspend fun unconform(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable uuid: UUID
+    ) =
+        userService.deleteUser(userUuid = uuid)
 
     @PatchMapping
     @CheckToken(Roles.ADMIN)
