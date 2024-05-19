@@ -10,10 +10,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
+import org.springframework.http.HttpStatusCode
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.item.AllFilesDto
 import ru.kosti.googledrivemanager.dto.item.CreateItemDto
 import ru.kosti.googledrivemanager.entity.UserEntity
+import ru.kosti.googledrivemanager.exception.ApiException
 import ru.kosti.googledrivemanager.extention.toDto
 
 @Service
@@ -33,7 +35,7 @@ class DriveService(
         val user = userService.findById(currentUserUuid)
 
         if (!checkCapabilities(folderId, user)) {
-            throw Exception("User does not have the required capabilities")
+            throw ApiException(HttpStatusCode.valueOf(403), "User does not have the required capabilities")
         }
         val query = "'$folderId' in parents"
         val result: FileList = drive.files().list()
@@ -51,7 +53,7 @@ class DriveService(
         val user = userService.findById(currentUserUuid)
 
         if (!checkCapabilities(newFile.parent, user)) {
-            throw Exception("User does not have the required capabilities")
+            throw ApiException(HttpStatusCode.valueOf(403), "User does not have the required capabilities")
         }
         CoroutineScope(Dispatchers.Default).launch {
 

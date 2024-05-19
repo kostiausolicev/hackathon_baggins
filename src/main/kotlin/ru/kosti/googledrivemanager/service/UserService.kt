@@ -4,12 +4,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.http.HttpStatusCode
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.user.CreateUserDto
 import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.Roles
+import ru.kosti.googledrivemanager.exception.ApiException
 import ru.kosti.googledrivemanager.repository.UserRepository
 import java.util.*
 
@@ -23,7 +25,7 @@ class UserService(
 ) {
     suspend fun findById(userUuid: UUID) =
         userRepository.findByIdOrNull(userUuid)
-            ?: throw Exception()
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
 
     suspend fun findAllByRootAvailablePath(path: String): Set<UserEntity> {
         val roles = capabilitiesService.findByPathsContaining(path)
@@ -36,10 +38,10 @@ class UserService(
 
     suspend fun update(dto: UpdateUserDto) {
         val old = userRepository.findByIdOrNull(dto.uuid)
-            ?: throw Exception()
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
         val capabilities = if (dto.capabilities != null)
             capabilitiesService.findByIdOrNull(dto.capabilities)
-                ?: throw Exception()
+                ?: throw ApiException(HttpStatusCode.valueOf(404), "Capabilities not found")
         else old.capabilities
         val new = UserEntity(
             uuid = old.uuid,

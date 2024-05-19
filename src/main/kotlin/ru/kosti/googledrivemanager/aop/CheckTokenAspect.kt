@@ -34,7 +34,11 @@ class CheckTokenAspect(
         val token = (pjp.args[0] as String).let {
             if (it.startsWith("Bearer")) it.split(' ')[1] else it
         }
-        val user = jwtService.decode(token)
+        val user = try {
+            jwtService.decode(token)
+        } catch (ex: Exception) {
+            return ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED)
+        }
         val currentRole = try {
             runBlocking { userService.findById(user.uuid).role }
         } catch (ex: Exception) {
