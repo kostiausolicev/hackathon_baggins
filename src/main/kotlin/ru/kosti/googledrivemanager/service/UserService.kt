@@ -89,6 +89,8 @@ class UserService(
             throw Exception()
         if (dto.password != dto.repeatPassword)
             throw Exception()
+        if (userRepository.findByEmail(dto.email) != null)
+            throw ApiException(HttpStatusCode.valueOf(400), "User exist")
         val user = UserEntity(
             firstName = dto.firstName,
             lastName = dto.lastName,
