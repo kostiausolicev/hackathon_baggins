@@ -8,3 +8,6 @@ databaseChangeLog:
   - include:
       id: 3
       file: db/changelog/create_table_users.sql
+  - include:
+      id: 4
+      file: db/changelog/add_email_conform_column.sql

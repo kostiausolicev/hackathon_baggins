@@ -15,6 +15,7 @@ class UserEntity (
     @Column(name = "last_name")
     val lastName: String,
     val email: String,
+    val emailConform: Boolean = false,
     val isConformed: Boolean = false,
     @Enumerated(EnumType.STRING)
     val role: Roles,

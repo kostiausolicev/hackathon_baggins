@@ -23,11 +23,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.security:spring-security-oauth2-authorization-server:1.2.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core:4.24.0")
-    implementation("org.springframework.boot:spring-boot-starter-aop:3.2.5")
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 
     implementation("org.springdoc:springdoc-openapi-starter-common:2.4.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")

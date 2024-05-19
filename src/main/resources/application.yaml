@@ -6,6 +6,21 @@ google:
   credentials: ${PRIVATE_KEY_FILE}
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL}
+    password: ${EMAIL_PASS}
+    test-connection: true
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+    sender:
+      email: bagginsdrive@gmail.com
+      text: no-reply
   datasource:
     url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/postgres}
     username: ${POSTGRES_USER:admin}
