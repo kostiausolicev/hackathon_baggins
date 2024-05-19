@@ -60,4 +60,8 @@ class UserController(
         @RequestBody dto: UpdateUserDto
     ) =
         userService.update(dto)
+
+    @GetMapping("/verify/{uuid}")
+    suspend fun verify(@PathVariable uuid: UUID) =
+        userService.verifyEmail(uuid)
 }

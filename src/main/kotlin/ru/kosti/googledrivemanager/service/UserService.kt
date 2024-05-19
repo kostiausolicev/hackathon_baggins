@@ -27,6 +27,7 @@ class UserService(
     private val accessService: AccessService,
     private val jwtService: JwtService,
     private val drive: Drive,
+    private val mail: MailService,
     private val passwordEncoder: BCryptPasswordEncoder
 ) {
     suspend fun findDtoById(userUuid: UUID) =
@@ -65,6 +66,8 @@ class UserService(
             firstName = dto.firstName ?: old.firstName,
             lastName = dto.lastName ?: old.lastName,
             email = old.email,
+            isConformed = old.isConformed,
+            emailConform = old.emailConform,
             role = dto.role ?: old.role,
             password = old.password,
             capabilities = capabilities
@@ -91,6 +94,7 @@ class UserService(
             password = passwordEncoder.encode(dto.password),
             email = dto.email
         ).let { userRepository.save(it) }
+        mail.sendVerificationMessage(user.email, user.uuid)
 //        return jwtService.generate(email = user.email, uuid = user.uuid)
     }
 
@@ -104,11 +108,13 @@ class UserService(
             firstName = ent.firstName,
             lastName = ent.lastName,
             email = ent.email,
+            emailConform = ent.emailConform,
             isConformed = true,
             role = Roles.USER,
             password = ent.password,
             capabilities = capabilities
         ).let { userRepository.save(it) }
+        mail.sendAcceptMessage(user.email)
         user.capabilities?.paths?.forEach { path ->
             accessService.addAccess(user.email, path)
         }
@@ -118,9 +124,25 @@ class UserService(
         val user = userRepository.findByIdOrNull(userUuid)
             ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
         userRepository.delete(user)
+        mail.sendDenyMessage(user.email)
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)
         }
+    }
+
+    suspend fun verifyEmail(uuid: UUID): String {
+        val ent = userRepository.findByIdOrNull(uuid)
+            ?: throw Exception()
+        UserEntity(
+            uuid = ent.uuid,
+            firstName = ent.firstName,
+            lastName = ent.lastName,
+            email = ent.email,
+            emailConform = true,
+            role = Roles.USER,
+            password = ent.password,
+        ).let { userRepository.save(it) }
+        return "ok"
     }
 
     fun auth(dto: AuthUserDto): SuccessAuthDto {
