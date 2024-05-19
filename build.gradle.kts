@@ -27,11 +27,13 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.liquibase:liquibase-core:4.24.0")
+    implementation("org.springframework.boot:spring-boot-starter-aop:3.2.5")
 
     implementation("org.springdoc:springdoc-openapi-starter-common:2.4.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.4.0")
 
+    implementation("com.auth0:java-jwt:4.4.0")
     implementation("com.google.api-client:google-api-client:2.0.0")
     implementation("com.google.oauth-client:google-oauth-client-jetty:1.34.1")
     implementation("com.google.apis:google-api-services-drive:v3-rev20220815-2.0.0")

@@ -1,8 +1,9 @@
 package ru.kosti.googledrivemanager.controller
 
 import org.springframework.web.bind.annotation.*
-import ru.kosti.googledrivemanager.dto.CreateItemDto
-import ru.kosti.googledrivemanager.service.AccessService
+import ru.kosti.googledrivemanager.aop.CheckToken
+import ru.kosti.googledrivemanager.dto.item.CreateItemDto
+import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.service.DriveService
 
 @RestController
@@ -11,21 +12,29 @@ class DriverController(
     private val driveService: DriveService
 ) {
     @GetMapping("/{root}")
-    fun getAllByRoot(
+    @CheckToken(Roles.USER)
+    suspend fun getAllByRoot(
+        @RequestHeader("Authorization") token: String,
         @RequestParam(required = false) limit: Int = 10,
         @RequestParam(required = false) pageToken: String? = null,
         @PathVariable root: String
     ) =
-        driveService.getAll(limit = limit, pageToken = pageToken, folderId = root)
+        driveService.getAll(limit = limit, pageToken = pageToken, folderId = root, token = token)
 
     @GetMapping
-    fun getAll(
+    @CheckToken(Roles.USER)
+    suspend fun getAll(
+        @RequestHeader("Authorization") token: String,
         @RequestParam(required = false) limit: Int = 10,
         @RequestParam(required = false) pageToken: String? = null
     ) =
-        driveService.getAll(limit = limit, pageToken = pageToken)
+        driveService.getAll(limit = limit, pageToken = pageToken, token = token)
 
     @PostMapping
-    suspend fun create(@RequestBody createItemDto: CreateItemDto) =
-        driveService.create(createItemDto)
+    @CheckToken(Roles.USER)
+    suspend fun create(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody createItemDto: CreateItemDto
+    ) =
+        driveService.create(createItemDto, token)
 }

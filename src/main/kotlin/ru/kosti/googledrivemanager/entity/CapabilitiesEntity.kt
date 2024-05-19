@@ -8,10 +8,13 @@ import java.util.*
 class CapabilitiesEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    val uuid: UUID,
+    val uuid: UUID = UUID.randomUUID(),
     val title: String,
     @ElementCollection
-    @CollectionTable(name = "capabilities_paths", joinColumns = [JoinColumn(name = "capabilities_uuid")])
-    @Column(name = "capabilities")
+    @CollectionTable(
+        name = "capabilities_paths",
+        joinColumns = [JoinColumn(name = "capabilities_uuid")]
+    )
+    @Column(name = "path")
     val paths: Set<String>
 )
