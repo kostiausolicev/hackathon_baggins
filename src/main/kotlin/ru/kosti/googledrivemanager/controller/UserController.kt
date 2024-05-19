@@ -22,6 +22,14 @@ class UserController(
     ) =
         userService.findAll(limit, page)
 
+    @GetMapping("/{uuid}")
+    @CheckToken(Roles.ADMIN)
+    suspend fun getByUuid(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable uuid: UUID
+    ) =
+        userService.findById(uuid)
+
     @PostMapping("/register")
     suspend fun register(@RequestBody dto: CreateUserDto) =
         userService.createUser(dto)
@@ -36,6 +44,10 @@ class UserController(
         userService.conform(userUuid = uuid, roleUuid = role)
 
     @PatchMapping
-    suspend fun update(@RequestBody dto: UpdateUserDto) =
+    @CheckToken(Roles.ADMIN)
+    suspend fun update(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody dto: UpdateUserDto
+    ) =
         userService.update(dto)
 }

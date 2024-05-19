@@ -7,8 +7,3 @@ data class CapabilitiesDto(
     val title: String,
     val paths: List<PathDto>
 )
-
-data class PathDto(
-    val name: String,
-    val id: String
-)

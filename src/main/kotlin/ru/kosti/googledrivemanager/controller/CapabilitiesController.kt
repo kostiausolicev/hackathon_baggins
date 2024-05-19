@@ -14,18 +14,24 @@ class CapabilitiesController(
 ) {
     @GetMapping
     @CheckToken(Roles.USER)
-    suspend fun getAll() =
+    suspend fun getAll(
+        @RequestHeader("Authorization") token: String,
+    ) =
         capabilitiesService.findAll()
 
     @PostMapping
     @CheckToken(Roles.ADMIN)
-    suspend fun create(@RequestBody dto: CreateCapabilitiesDto) {
+    suspend fun create(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody dto: CreateCapabilitiesDto
+    ) =
         capabilitiesService.create(dto)
-    }
 
     @PatchMapping
     @CheckToken(Roles.ADMIN)
-    suspend fun update(@RequestBody dto: UpdateCapabilitiesDto) {
+    suspend fun update(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody dto: UpdateCapabilitiesDto
+    ) =
         capabilitiesService.update(dto)
-    }
 }
