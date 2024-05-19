@@ -28,12 +28,17 @@ class DriveService(
 ) {
     suspend fun getAll(
         limit: Int,
-        folderId: String = "1OGPa_sQSfshN8-NspxHJtagj47-0ZzEn",
+        folderId: String? = null,
         pageToken: String? = null,
         token: String
     ): AllFilesDto {
         val currentUserUuid = jwtService.decode(token).uuid
         val user = userService.findById(currentUserUuid)
+
+        if (folderId == null) {
+            val res = user.capabilities?.paths ?: emptySet()
+            return res.toDto(drive)
+        }
 
         if (!checkCapabilities(folderId, user)) {
             throw ApiException(HttpStatusCode.valueOf(403), "User does not have the required capabilities")
