@@ -30,7 +30,7 @@ class DriveService(
         token: String
     ): AllFilesDto {
         val currentUserUuid = jwtService.decode(token).uuid
-        val user = userService.findByIdOrNull(currentUserUuid)
+        val user = userService.findById(currentUserUuid)
 
         if (!checkCapabilities(folderId, user)) {
             throw Exception("User does not have the required capabilities")
@@ -48,7 +48,7 @@ class DriveService(
 
     suspend fun create(newFile: CreateItemDto, token: String) {
         val currentUserUuid = jwtService.decode(token).uuid
-        val user = userService.findByIdOrNull(currentUserUuid)
+        val user = userService.findById(currentUserUuid)
 
         if (!checkCapabilities(newFile.parent, user)) {
             throw Exception("User does not have the required capabilities")
@@ -97,8 +97,8 @@ class DriveService(
     }
 
     private suspend fun getFileParents(fileId: String): List<String> {
-        val parents = mutableListOf<String>()
         var currentFileId = fileId
+        val parents = mutableListOf(currentFileId)
         while (true) {
             val file = drive.files().get(currentFileId).setFields("parents").execute()
             val parentId = file.parents?.firstOrNull() ?: break

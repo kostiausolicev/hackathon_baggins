@@ -3,15 +3,11 @@ package ru.kosti.googledrivemanager.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import ru.kosti.googledrivemanager.dto.user.CreateUserDto
 import ru.kosti.googledrivemanager.dto.user.UpdateUserDto
-import ru.kosti.googledrivemanager.dto.user.UserDetailsImpl
 import ru.kosti.googledrivemanager.entity.UserEntity
 import ru.kosti.googledrivemanager.enumeration.Roles
 import ru.kosti.googledrivemanager.repository.UserRepository
@@ -25,7 +21,7 @@ class UserService(
     private val jwtService: JwtService,
     private val passwordEncoder: BCryptPasswordEncoder
 ) {
-    suspend fun findByIdOrNull(userUuid: UUID) =
+    suspend fun findById(userUuid: UUID) =
         userRepository.findByIdOrNull(userUuid)
             ?: throw Exception()
 
@@ -100,7 +96,7 @@ class UserService(
     }
 
     suspend fun deleteUser(userUuid: UUID) {
-        val user = findByIdOrNull(userUuid)
+        val user = findById(userUuid)
         userRepository.delete(user)
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)

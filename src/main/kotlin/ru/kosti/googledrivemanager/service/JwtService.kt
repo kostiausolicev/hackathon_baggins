@@ -10,7 +10,7 @@ import java.util.*
 @Service
 class JwtService(
     @Value("\${jwt.secret}")
-    val secret: String,
+    private val secret: String,
 ) {
     fun decode(rawToken: String): UserDtoOnRequest {
         val token = if (rawToken.startsWith("Bearer"))
