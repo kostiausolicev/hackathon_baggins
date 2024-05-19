@@ -44,7 +44,7 @@ class CheckTokenAspect(
         } catch (ex: Exception) {
             return ResponseEntity<String>(ex.message, HttpStatus.BAD_REQUEST)
         }
-        if (!currentRole.isConformed) {
+        if (!currentRole.isConformed || !currentRole.emailConform) {
             return ResponseEntity<String>("Access deny", HttpStatus.FORBIDDEN)
         }
         if (roleRequired.order < currentRole.role.order) {
