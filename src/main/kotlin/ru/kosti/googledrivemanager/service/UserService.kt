@@ -150,6 +150,8 @@ class UserService(
     fun auth(dto: AuthUserDto): SuccessAuthDto {
         val user = userRepository.findByEmail(dto.email)
             ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
+        if (!user.isConformed || !user.emailConform)
+            throw ApiException(HttpStatusCode.valueOf(403), "You are not conform")
         if (!passwordEncoder.matches(dto.password, user.password))
             throw ApiException(HttpStatusCode.valueOf(405), "Wrong password")
         return SuccessAuthDto(
