@@ -33,6 +33,7 @@ class UserService(
 ) {
     suspend fun findById(userUuid: UUID) =
         userRepository.findByIdOrNull(userUuid)
+            ?.toDto(drive)
             ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
 
     suspend fun findAllByRootAvailablePath(path: String): Set<UserEntity> {
@@ -112,7 +113,8 @@ class UserService(
     }
 
     suspend fun deleteUser(userUuid: UUID) {
-        val user = findById(userUuid)
+        val user = userRepository.findByIdOrNull(userUuid)
+            ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
         userRepository.delete(user)
         CoroutineScope(Dispatchers.Default).launch {
             accessService.removeAccess(user.email)
