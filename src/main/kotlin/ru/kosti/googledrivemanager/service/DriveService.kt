@@ -116,4 +116,9 @@ class DriveService(
         }
         return parents
     }
+
+    suspend fun openFile(fileId: String): String {
+        val file = drive.files().get(fileId).setFields("webViewLink").execute()
+        return file.webViewLink
+    }
 }

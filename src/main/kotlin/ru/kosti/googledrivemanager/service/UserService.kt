@@ -4,8 +4,6 @@ import com.google.api.services.drive.Drive
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
@@ -51,7 +49,11 @@ class UserService(
     suspend fun findAll(limit: Int, page: Int = 0): List<UserDto> {
         val pageable = PageRequest.of(page, limit, Sort.by(Sort.Order.asc("isConformed")))
         val users = userRepository.findAll(pageable)
-        return users.content.map { it.toDto(drive) }
+        return users.content.mapNotNull {
+            if (it.emailConform)
+                it.toDto(drive)
+            else null
+        }
     }
 
     suspend fun update(dto: UpdateUserDto) {
@@ -87,6 +89,8 @@ class UserService(
             throw Exception()
         if (dto.password != dto.repeatPassword)
             throw Exception()
+        if (userRepository.findByEmail(dto.email) != null)
+            throw ApiException(HttpStatusCode.valueOf(400), "User exist")
         val user = UserEntity(
             firstName = dto.firstName,
             lastName = dto.lastName,
@@ -148,6 +152,8 @@ class UserService(
     fun auth(dto: AuthUserDto): SuccessAuthDto {
         val user = userRepository.findByEmail(dto.email)
             ?: throw ApiException(HttpStatusCode.valueOf(404), "User not found")
+        if (!user.isConformed || !user.emailConform)
+            throw ApiException(HttpStatusCode.valueOf(403), "You are not conform")
         if (!passwordEncoder.matches(dto.password, user.password))
             throw ApiException(HttpStatusCode.valueOf(405), "Wrong password")
         return SuccessAuthDto(
