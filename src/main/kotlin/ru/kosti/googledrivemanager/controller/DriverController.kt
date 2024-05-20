@@ -30,6 +30,14 @@ class DriverController(
     ) =
         driveService.getAll(limit = limit, pageToken = pageToken, token = token)
 
+    @GetMapping("/open/{fileId}")
+    @CheckToken(Roles.USER)
+    suspend fun openFile(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable fileId: String
+    ) =
+        driveService.openFile(fileId)
+
     @PostMapping
     @CheckToken(Roles.USER)
     suspend fun create(
